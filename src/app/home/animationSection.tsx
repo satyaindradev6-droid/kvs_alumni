@@ -23,7 +23,7 @@ export default function AlumniSection() {
       <div className="absolute bottom-[150px] right-[35%] w-[45px] h-[45px] animate-bounce" style={{ animationDelay: '1s' }}>
         <Image src="/images/Group 13.svg" alt="Decorative icon" width={45} height={45} className="object-contain" />
       </div>
-      <div className="absolute bottom-20 left-[45%] w-[55px] h-[55px] animate-bounce" style={{ animationDelay: '0.4s' }}>
+      <div className="absolute bottom-20 left-[45%] w-[55px] h-[55px] animate-slide-lr" style={{ animationDelay: '0.4s' }}>
         <Image src="/images/Group 11.svg" alt="Decorative icon" width={55} height={55} className="object-contain" />
       </div>
 
@@ -44,7 +44,7 @@ export default function AlumniSection() {
               <br />
               Learn More About Us{" "}
             </h1>
-            <div className="absolute -right-12 top-0 w-[60px] h-[60px]">
+            <div className="absolute -right-12 top-0 w-[60px] h-[60px] animate-slide-lr">
               <Image src="/images/Group 8.svg" alt="Decorative icon" width={60} height={60} className="object-contain" />
             </div>
           </div>
