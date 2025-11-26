@@ -3,6 +3,8 @@ import { HeroSection } from "./HeroSection"
 import AlumniSection from "./animationSection"
 import { StatsSection } from "./statsSection"
 import { EventsSection } from "./upcomingEvents"
+import { ContactSection } from "./contactSection"
+import AlumniImages from "./alumni"
 
 export default function HomePage() {
   return (
@@ -11,6 +13,8 @@ export default function HomePage() {
       <AlumniSection/>
       <StatsSection />
       <EventsSection />
+      {/* <ContactSection /> */}
+      {/* <AlumniImages /> */}
     </div>
   )
 }
