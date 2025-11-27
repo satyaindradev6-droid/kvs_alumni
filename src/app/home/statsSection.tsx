@@ -1,4 +1,7 @@
+"use client"
+
 import Image from "next/image"
+import { useEffect, useRef, useState } from "react"
 
 const stats = [
   {
@@ -22,6 +25,53 @@ const stats = [
     label: "Total Alumni Teachers",
   },
 ]
+
+function CounterAnimation({ targetValue }: { targetValue: string }) {
+  const [count, setCount] = useState(0)
+  const [hasAnimated, setHasAnimated] = useState(false)
+  const elementRef = useRef<HTMLDivElement>(null)
+  const target = parseInt(targetValue.replace(/,/g, ""))
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasAnimated) {
+          setHasAnimated(true)
+          
+          const duration = 1200 // 1.2 seconds
+          const steps = 60
+          const increment = target / steps
+          let current = 0
+
+          const timer = setInterval(() => {
+            current += increment
+            if (current >= target) {
+              setCount(target)
+              clearInterval(timer)
+            } else {
+              setCount(Math.floor(current))
+            }
+          }, duration / steps)
+
+          return () => clearInterval(timer)
+        }
+      },
+      { threshold: 0.3 }
+    )
+
+    if (elementRef.current) {
+      observer.observe(elementRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [target, hasAnimated])
+
+  return (
+    <div ref={elementRef} className="mb-3 text-5xl font-light tracking-tight text-white md:text-6xl">
+      {count.toLocaleString()}
+    </div>
+  )
+}
 
 export function StatsSection() {
   return (
@@ -54,7 +104,7 @@ export function StatsSection() {
                 </div>
 
                 {/* Value */}
-                <div className="mb-3 text-5xl font-light tracking-tight text-white md:text-6xl">{stat.value}</div>
+                <CounterAnimation targetValue={stat.value} />
 
                 {/* Label */}
                 <div className="text-base font-normal tracking-wide text-[#4fd1c5]">{stat.label}</div>

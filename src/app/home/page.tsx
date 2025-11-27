@@ -13,8 +13,9 @@ export default function HomePage() {
       <AlumniSection/>
       <StatsSection />
       <EventsSection />
-      {/* <ContactSection /> */}
-      {/* <AlumniImages /> */}
+     
+      <AlumniImages />
+       {/* <ContactSection /> */}
     </div>
   )
 }
