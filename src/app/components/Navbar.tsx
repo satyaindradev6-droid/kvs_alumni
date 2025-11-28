@@ -1,8 +1,12 @@
+'use client'
+
 import { ChevronDown } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export function Navbar() {
+  const router = useRouter()
   return (
     <header className="w-full">
       {/* Top dark blue bar */}
@@ -45,7 +49,10 @@ export function Navbar() {
             </button>
 
             {/* Login button */}
-            <button className="flex items-center gap-1 border-2 border-[#2c3e6e] text-[#2c3e6e] px-5 py-2 rounded-md hover:bg-[#f0f0f0] transition-colors">
+            <button 
+              onClick={() => router.push('/login')}
+              className="flex items-center gap-1 border-2 border-[#2c3e6e] text-[#2c3e6e] px-5 py-2 rounded-md hover:bg-[#f0f0f0] transition-colors"
+            >
               Login
               <ChevronDown className="w-4 h-4" />
             </button>

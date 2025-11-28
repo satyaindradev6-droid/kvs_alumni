@@ -47,12 +47,12 @@ export default function AlumniSection() {
               <br />
               Learn More About Us{" "}
               <span className="inline-block ml-2">
-                <Image src="/images/Pen.svg" alt="Pen" width={50} height={50} className="inline-block" />
+                <Image src="/images/Group 8.svg" alt="Pen" width={50} height={50} className="inline-block" />
               </span>
             </h1>
           </div>
 
-          <p className="text-gray-700 leading-relaxed max-w-lg text-[15px]">
+          <p className="text-gray-700 leading-relaxed max-w-lg text-[15px]">    
             This Alumni platform of Kendriya Vidyalaya Sangathan serves as a means to reconnect 
             with classmates, teachers, and the school community. This platform facilitates 
             communication, share updates about alumni achievements, and organize reunions or 
