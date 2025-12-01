@@ -25,8 +25,8 @@ export function LoginForm() {
   return (
     <div className="space-y-8">
       <div className="space-y-3">
-        <div className="inline-block px-4 py-1.5 rounded-full bg-[#00D9FF]/10 border border-[#00D9FF]/20 mb-2">
-          <span className="text-xs font-medium text-[#00D9FF]">KVS Alumni Portal</span>
+        <div className="inline-block px-4 py-1.5 rounded-full bg-[var(--theme-primary)]/10 border border-[var(--theme-primary)]/20 mb-2">
+          <span className="text-xs font-medium text-[var(--theme-primary)]">KVS Alumni Portal</span>
         </div>
         <h2 className="text-4xl font-bold text-foreground tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
           Welcome back
@@ -41,14 +41,14 @@ export function LoginForm() {
               Email address
             </Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#00D9FF]" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--theme-primary)]" />
               <Input
                 id="email"
                 type="email"
                 placeholder="your.email@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="pl-10 h-12 bg-card/50 backdrop-blur-sm border-border focus:border-[#00D9FF] focus:ring-[#00D9FF] transition-all duration-300 hover:border-[#00D9FF]/50"
+                className="pl-10 h-12 bg-card/50 backdrop-blur-sm border-border focus:border-[var(--theme-primary)] focus:ring-[var(--theme-primary)] transition-all duration-300 hover:border-[var(--theme-primary)]/50"
                 required
               />
             </div>
@@ -59,20 +59,20 @@ export function LoginForm() {
               Password
             </Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#00D9FF]" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--theme-primary)]" />
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 pr-10 h-12 bg-card/50 backdrop-blur-sm border-border focus:border-[#00D9FF] focus:ring-[#00D9FF] transition-all duration-300 hover:border-[#00D9FF]/50"
+                className="pl-10 pr-10 h-12 bg-card/50 backdrop-blur-sm border-border focus:border-[var(--theme-primary)] focus:ring-[var(--theme-primary)] transition-all duration-300 hover:border-[var(--theme-primary)]/50"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-[#00D9FF] transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-[var(--theme-primary)] transition-colors"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -85,20 +85,20 @@ export function LoginForm() {
           <div className="flex items-center gap-2">
             <Checkbox
               id="remember"
-              className="border-border data-[state=checked]:bg-[#00D9FF] data-[state=checked]:border-[#00D9FF]"
+              className="border-border data-[state=checked]:bg-[var(--theme-primary)] data-[state=checked]:border-[var(--theme-primary)]"
             />
             <Label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer">
               Remember me
             </Label>
           </div>
-          <a href="#" className="text-sm font-medium text-[#00D9FF] hover:text-[#01C3E5] transition-colors">
+          <a href="#" className="text-sm font-medium text-[var(--theme-primary)] hover:text-[var(--theme-primary2)] transition-colors">
             Forgot password?
           </a>
         </div>
 
         <Button
           type="submit"
-          className="w-full h-12 bg-gradient-to-r from-[#00D9FF] to-[#01C3E5] hover:from-[#01C3E5] hover:to-[#00D9FF] text-[#0a1628] font-semibold text-base group shadow-lg shadow-[#00D9FF]/30 hover:shadow-xl hover:shadow-[#00D9FF]/40 transition-all duration-300 hover:scale-[1.02]"
+          className="w-full h-12 bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-primary2)] hover:from-[var(--theme-primary2)] hover:to-[var(--theme-primary)] text-[#0a1628] font-semibold text-base group shadow-lg shadow-[var(--theme-primary)]/30 hover:shadow-xl hover:shadow-[var(--theme-primary)]/40 transition-all duration-300 hover:scale-[1.02]"
           disabled={isLoading}
         >
           {isLoading ? (
@@ -143,7 +143,7 @@ export function LoginForm() {
         <Button
           type="button"
           variant="outline"
-          className="h-12 border-border hover:bg-[#00D9FF]/10 hover:border-[#00D9FF] bg-card/30 backdrop-blur-sm transition-all duration-300 hover:scale-105"
+          className="h-12 border-border hover:bg-[var(--theme-primary)]/10 hover:border-[var(--theme-primary)] bg-card/30 backdrop-blur-sm transition-all duration-300 hover:scale-105"
         >
           <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
             <path
@@ -168,7 +168,7 @@ export function LoginForm() {
         <Button
           type="button"
           variant="outline"
-          className="h-12 border-border hover:bg-[#00D9FF]/10 hover:border-[#00D9FF] bg-card/30 backdrop-blur-sm transition-all duration-300 hover:scale-105"
+          className="h-12 border-border hover:bg-[var(--theme-primary)]/10 hover:border-[var(--theme-primary)] bg-card/30 backdrop-blur-sm transition-all duration-300 hover:scale-105"
         >
           <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
             <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
@@ -180,13 +180,13 @@ export function LoginForm() {
       <div className="text-center">
         <p className="text-sm text-muted-foreground mb-4">
           {"Don't have an account? "}
-          <a href="#" className="font-semibold text-[#00D9FF] hover:text-[#01C3E5] transition-colors underline-offset-4 hover:underline">
+          <a href="#" className="font-semibold text-[var(--theme-primary)] hover:text-[var(--theme-primary2)] transition-colors underline-offset-4 hover:underline">
             Register as Alumni
           </a>
         </p>
         
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#00D9FF]/5 border border-[#00D9FF]/20">
-          <svg className="w-4 h-4 text-[#00D9FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--theme-primary)]/5 border border-[var(--theme-primary)]/20">
+          <svg className="w-4 h-4 text-[var(--theme-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span className="text-xs text-muted-foreground">Secure login powered by KVS</span>
@@ -195,15 +195,15 @@ export function LoginForm() {
 
       <div className="pt-6 border-t border-border/50">
         <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground">
-          <a href="#" className="hover:text-[#00D9FF] transition-colors hover:underline underline-offset-4">
+          <a href="#" className="hover:text-[var(--theme-primary)] transition-colors hover:underline underline-offset-4">
             Privacy Policy
           </a>
           <span className="text-border">•</span>
-          <a href="#" className="hover:text-[#00D9FF] transition-colors hover:underline underline-offset-4">
+          <a href="#" className="hover:text-[var(--theme-primary)] transition-colors hover:underline underline-offset-4">
             Terms of Service
           </a>
           <span className="text-border">•</span>
-          <a href="#" className="hover:text-[#00D9FF] transition-colors hover:underline underline-offset-4">
+          <a href="#" className="hover:text-[var(--theme-primary)] transition-colors hover:underline underline-offset-4">
             Contact Support
           </a>
         </div>

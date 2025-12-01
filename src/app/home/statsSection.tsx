@@ -84,8 +84,8 @@ export function StatsSection() {
         }}
       />
 
-      {/* Dark Blue/Purple Overlay */}
-      <div className="absolute inset-0 bg-[#2a2d5e]/90" />
+      {/* Primary Color Overlay */}
+      <div className="absolute inset-0" style={{ backgroundColor: 'color-mix(in srgb, var(--theme-primary) 85%, #000)' }} />
 
       {/* Content */}
       <div className="relative z-10 px-4 py-12 md:py-16">
@@ -107,7 +107,7 @@ export function StatsSection() {
                 <CounterAnimation targetValue={stat.value} />
 
                 {/* Label */}
-                <div className="text-base font-normal tracking-wide text-[#4fd1c5]">{stat.label}</div>
+                <div className="text-base font-normal tracking-wide text-white">{stat.label}</div>
               </div>
             ))}
           </div>

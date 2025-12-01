@@ -26,7 +26,7 @@ export function HeroSection() {
       <div className="relative w-full h-[350px] md:h-[450px] lg:h-[550px] xl:h-[600px] overflow-hidden">
 
         {/* Background Gradient (covers left side similar to image) */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#18245d] via-[#223176] to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--theme-primary)] via-[var(--theme-primary2)] to-transparent z-10" />
 
         {/* Carousel Images */}
         {slides.map((slide, index) => (
@@ -47,7 +47,7 @@ export function HeroSection() {
             />
 
             {/* Extra dark fade on far-left so text stays readable */}
-            <div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-[#111b4d]/90 to-transparent" />
+            <div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-[var(--theme-primary)]/90 to-transparent" />
           </div>
         ))}
 

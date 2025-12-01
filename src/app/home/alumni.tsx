@@ -66,8 +66,8 @@ export default function AlumniImages() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-10">
-          <p className="text-sm font-semibold tracking-wide text-gray-800 uppercase mb-2">OUR ALUMNIS</p>
-          <h2 className="text-4xl font-bold text-[#00bcd4] mb-3">Members</h2>
+          <p className="text-sm font-semibold tracking-wide uppercase mb-2" style={{ color: 'var(--theme-primary)' }}>OUR ALUMNIS</p>
+          <h2 className="text-4xl font-bold mb-3" style={{ color: 'var(--theme-primary)' }}>Members</h2>
           <p className="text-gray-500 text-sm max-w-3xl">
             Alumni are great role models for current students and are often well placed to offer practical support to
             students as they start their careers.
@@ -79,7 +79,19 @@ export default function AlumniImages() {
           {/* Left Arrow */}
           <button
             onClick={prevSlide}
-            className="absolute -left-12 z-10 w-10 h-10 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:border-[#00bcd4] hover:text-[#00bcd4] transition-colors shadow-sm"
+            className="absolute -left-12 z-10 w-10 h-10 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-colors shadow-sm"
+            style={{ 
+              '--hover-border': 'var(--theme-primary)',
+              '--hover-text': 'var(--theme-primary)'
+            } as React.CSSProperties}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--theme-primary)'
+              e.currentTarget.style.color = 'var(--theme-primary)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = ''
+              e.currentTarget.style.color = ''
+            }}
             aria-label="Previous"
           >
             <ChevronLeft className="w-5 h-5 text-gray-400" />
@@ -97,7 +109,7 @@ export default function AlumniImages() {
                   />
                 </div>
                 <h3 className="font-medium text-gray-800 text-base">{member.name}</h3>
-                <p className="text-[#00bcd4] text-sm">{member.role}</p>
+                <p className="text-sm" style={{ color: 'var(--theme-primary)' }}>{member.role}</p>
               </div>
             ))}
           </div>
@@ -105,7 +117,19 @@ export default function AlumniImages() {
           {/* Right Arrow */}
           <button
             onClick={nextSlide}
-            className="absolute -right-12 z-10 w-10 h-10 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:border-[#00bcd4] hover:text-[#00bcd4] transition-colors shadow-sm"
+            className="absolute -right-12 z-10 w-10 h-10 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-colors shadow-sm"
+            style={{ 
+              '--hover-border': 'var(--theme-primary)',
+              '--hover-text': 'var(--theme-primary)'
+            } as React.CSSProperties}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--theme-primary)'
+              e.currentTarget.style.color = 'var(--theme-primary)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = ''
+              e.currentTarget.style.color = ''
+            }}
             aria-label="Next"
           >
             <ChevronRight className="w-5 h-5 text-gray-400" />

@@ -3,6 +3,62 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --theme-primary: #66E9FF;
+  --theme-primary2: #4DD8F0;
+  --theme-primary3: #33C7E0;
+  --theme-primary4: #1AB6D0;
+  --theme-secondary: #0891b2;
+  --theme-accent: #06b6d4;
+}
+
+/* Blue Theme */
+[data-theme="blue"] {
+  --theme-primary: #2c3e6e;
+  --theme-primary2: #3a4f7e;
+  --theme-primary3: #48608e;
+  --theme-primary4: #56719e;
+  --theme-secondary: #0891b2;
+  --theme-accent: #06b6d4;
+}
+
+/* Green Theme */
+[data-theme="green"] {
+  --theme-primary: #065f46;
+  --theme-primary2: #047857;
+  --theme-primary3: #059669;
+  --theme-primary4: #10b981;
+  --theme-secondary: #059669;
+  --theme-accent: #10b981;
+}
+
+/* Purple Theme */
+[data-theme="purple"] {
+  --theme-primary: #6b21a8;
+  --theme-primary2: #7c3aed;
+  --theme-primary3: #9333ea;
+  --theme-primary4: #a855f7;
+  --theme-secondary: #9333ea;
+  --theme-accent: #a855f7;
+}
+
+/* Orange Theme */
+[data-theme="orange"] {
+  --theme-primary: #c2410c;
+  --theme-primary2: #dc2626;
+  --theme-primary3: #ea580c;
+  --theme-primary4: #f97316;
+  --theme-secondary: #ea580c;
+  --theme-accent: #f97316;
+}
+
+/* Cyan Theme */
+[data-theme="cyan"] {
+  --theme-primary: #66E9FF;
+  --theme-primary2: #4DD8F0;
+  --theme-primary3: #33C7E0;
+  --theme-primary4: #1AB6D0;
+  --theme-secondary: #06b6d4;
+  --theme-accent: #66E9FF;
 }
 
 @theme inline {

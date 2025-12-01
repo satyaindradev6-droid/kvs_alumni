@@ -13,8 +13,8 @@ export function ContactSection() {
             alt="Kendriya Vidyalaya Building"
             className="absolute inset-0 w-full h-full object-cover"
           />
-          {/* Gradient Overlay - cyan tint with stronger opacity at bottom */}
-          <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/60 via-cyan-500/70 to-cyan-500/90" />
+          {/* Gradient Overlay - theme tint with stronger opacity at bottom */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[var(--theme-primary)]/60 via-[var(--theme-primary)]/70 to-[var(--theme-primary)]/90" />
 
           {/* Text Content - positioned at bottom */}
           <div className="relative h-full p-8 flex flex-col justify-end">
@@ -33,20 +33,22 @@ export function ContactSection() {
 
         {/* Right Form Section */}
         <div className="flex-1 p-8 lg:p-10 bg-white">
-          <p className="text-xs font-semibold tracking-wider text-gray-800 mb-1">LETS CONNECT</p>
-          <h1 className="text-4xl font-semibold text-cyan-500 mb-8">Contact Us</h1>
+          <p className="text-xs font-semibold tracking-wider mb-1" style={{ color: 'var(--theme-primary)' }}>LETS CONNECT</p>
+          <h1 className="text-4xl font-semibold mb-8" style={{ color: 'var(--theme-primary)' }}>Contact Us</h1>
 
           <form className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <input
                 type="text"
                 placeholder="Name"
-                className="w-full px-4 py-3.5 bg-cyan-50/70 border-0 rounded-md text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                className="w-full px-4 py-3.5 border-0 rounded-md text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2"
+                style={{ backgroundColor: 'color-mix(in srgb, var(--theme-accent) 10%, white)', borderColor: 'var(--theme-accent)' }}
               />
               <input
                 type="tel"
                 placeholder="Phone"
-                className="w-full px-4 py-3.5 bg-cyan-50/70 border-0 rounded-md text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                className="w-full px-4 py-3.5 border-0 rounded-md text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2"
+                style={{ backgroundColor: 'color-mix(in srgb, var(--theme-accent) 10%, white)', borderColor: 'var(--theme-accent)' }}
               />
             </div>
 
@@ -54,20 +56,33 @@ export function ContactSection() {
               <input
                 type="email"
                 placeholder="Email"
-                className="w-full px-4 py-3.5 bg-cyan-50/70 border-0 rounded-md text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                className="w-full px-4 py-3.5 border-0 rounded-md text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2"
+                style={{ backgroundColor: 'color-mix(in srgb, var(--theme-accent) 10%, white)', borderColor: 'var(--theme-accent)' }}
               />
               <input
                 type="text"
                 placeholder="Purpose"
-                className="w-full px-4 py-3.5 bg-cyan-50/70 border-0 rounded-md text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                className="w-full px-4 py-3.5 border-0 rounded-md text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2"
+                style={{ backgroundColor: 'color-mix(in srgb, var(--theme-accent) 10%, white)', borderColor: 'var(--theme-accent)' }}
               />
             </div>
 
             <textarea
               placeholder="Your Message"
               rows={4}
-              className="w-full px-4 py-3.5 bg-cyan-50/70 border-0 rounded-md text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 resize-none"
+              className="w-full px-4 py-3.5 border-0 rounded-md text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2 resize-none"
+              style={{ backgroundColor: 'color-mix(in srgb, var(--theme-accent) 10%, white)', borderColor: 'var(--theme-accent)' }}
             />
+
+            <div className="flex justify-center">
+              <button
+                type="submit"
+                className="px-8 py-3.5 text-white font-semibold rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{ backgroundColor: 'var(--theme-accent)', borderColor: 'var(--theme-accent)' }}
+              >
+                Submit
+              </button>
+            </div>
           </form>
         </div>
       </div>

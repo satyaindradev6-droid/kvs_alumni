@@ -1,3 +1,5 @@
+"use client"
+
 import { HeroSection } from "./home/HeroSection"
 import HomePage from "./home/page"
 
