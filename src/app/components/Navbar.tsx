@@ -22,6 +22,9 @@ export function Navbar() {
           .animate-gradient {
             animation: gradient 4s ease infinite;
           }
+          :global(.nav-link-hover:hover) {
+            color: var(--theme-primary) !important;
+          }
         `}</style>
 
         <div className="flex items-center gap-6">
@@ -85,37 +88,35 @@ export function Navbar() {
 
           {/* Navigation */}
           <nav className="flex items-center gap-8">
-            <style jsx>{`
-              .nav-link {
-                color: #000;
-              }
-              .nav-link:hover {
-                color: var(--theme-primary);
-              }
-            `}</style>
             <Link 
               href="/" 
-              className="nav-link font-medium hover:scale-105 transition-all duration-300 cursor-pointer"
+              className="text-black font-medium hover:scale-105 transition-all duration-300 cursor-pointer nav-link-hover"
             >
               Home
             </Link>
             <Link 
               href="/member" 
-              className="nav-link font-medium hover:scale-105 transition-all duration-300 cursor-pointer"
+              className="text-black font-medium hover:scale-105 transition-all duration-300 cursor-pointer nav-link-hover"
             >
               Member
             </Link>
             <Link 
               href="/events" 
-              className="nav-link font-medium hover:scale-105 transition-all duration-300 cursor-pointer"
+              className="text-black font-medium hover:scale-105 transition-all duration-300 cursor-pointer nav-link-hover"
             >
               Events
             </Link>
             <Link 
               href="/alumni-news" 
-              className="nav-link font-medium hover:scale-105 transition-all duration-300 cursor-pointer"
+              className="text-black font-medium hover:scale-105 transition-all duration-300 cursor-pointer nav-link-hover"
             >
               Alumni in News
+            </Link>
+            <Link 
+              href="/chat" 
+              className="text-black font-medium hover:scale-105 transition-all duration-300 cursor-pointer nav-link-hover"
+            >
+              Chat
             </Link>
             {/* Login button */}
             <button
