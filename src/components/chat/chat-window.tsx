@@ -60,7 +60,7 @@ export function ChatWindow({ conversation, onSendMessage, onBack, isMobile }: Ch
   return (
     <div className="flex h-full flex-col" style={{ backgroundColor: '#F2FBFC' }}>
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3">
+      <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3.5">
         <div className="flex items-center gap-3">
           {isMobile && (
             <Button variant="ghost" size="icon" onClick={onBack}>
@@ -128,7 +128,7 @@ export function ChatWindow({ conversation, onSendMessage, onBack, isMobile }: Ch
                       "rounded-lg px-4 py-2",
                       isOwn
                         ? "bg-primary text-primary-foreground"
-                        : "bg-white text-foreground border-2 border-primary",
+                        : "bg-white text-foreground border-2 border-cyan-500",
                     )}
                     style={isOwn ? { border: '2px solid white' } : undefined}
                   >

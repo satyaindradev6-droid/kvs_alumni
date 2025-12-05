@@ -1,9 +1,9 @@
 "use client"
 
-import { Canvas, useFrame } from "@react-three/fiber"
-import { OrbitControls, Sphere, Line, Text, Float } from "@react-three/drei"
+import { Canvas, useFrame, useLoader } from "@react-three/fiber"
+import { OrbitControls, Sphere, Line, Float } from "@react-three/drei"
 import { useRef, useMemo, useEffect, useState } from "react"
-import type * as THREE from "three"
+import * as THREE from "three"
 
 function useThemeColor() {
   const [themeColor, setThemeColor] = useState("#66E9FF")
@@ -97,29 +97,22 @@ function RotatingGlobe({ primaryColor, secondaryColor }: { primaryColor: string;
   )
 }
 
-function StableText({ color }: { color: string }) {
+function StableLogo() {
   const textRef = useRef<THREE.Mesh>(null)
+  const texture = useLoader(THREE.TextureLoader, '/images/kv_logo.png')
 
   useFrame((state) => {
     if (textRef.current) {
-      // Keep the text facing the camera
+      // Keep the logo facing the camera
       textRef.current.quaternion.copy(state.camera.quaternion)
     }
   })
 
   return (
-    <Text
-      ref={textRef}
-      position={[0, 0, 0]}
-      fontSize={0.7}
-      color={color}
-      anchorX="center"
-      anchorY="middle"
-      fontWeight={900}
-      letterSpacing={0.05}
-    >
-      KVS
-    </Text>
+    <mesh ref={textRef} position={[0, 0, 0]}>
+      <planeGeometry args={[1.5, 1.5]} />
+      <meshBasicMaterial map={texture} transparent={true} side={THREE.DoubleSide} />
+    </mesh>
   )
 }
 
@@ -134,8 +127,8 @@ export function Design1Globe() {
         <Float speed={1} rotationIntensity={0.2} floatIntensity={0.3}>
           <RotatingGlobe primaryColor={themeColor} secondaryColor={themeColor2} />
         </Float>
-        {/* Stable KVS text in center */}
-        <StableText color={themeColor} />
+        {/* Stable KV logo in center */}
+        <StableLogo />
         <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
       </Canvas>
     </div>

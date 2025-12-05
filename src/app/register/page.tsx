@@ -47,21 +47,21 @@ export default function Register() {
                     <Users className="w-5 h-5 text-[var(--theme-primary)]" />
                   </div>
                   <p className="text-2xl font-semibold" style={{ color: 'var(--theme-primary)' }}>50K+</p>
-                  <p className="text-xs text-white/70">Active Alumni</p>
+                  <p className="text-xs" style={{ color: 'var(--theme-primary)' }}>Active Alumni</p>
                 </div>
                 <div className="text-center backdrop-blur-md bg-[var(--theme-primary)]/5 border border-[var(--theme-primary)]/20 rounded-xl p-2">
                   <div className="flex justify-center mb-2">
                     <Calendar className="w-5 h-5 text-[var(--theme-primary)]" />
                   </div>
                   <p className="text-2xl font-semibold" style={{ color: 'var(--theme-primary)' }}>200+</p>
-                  <p className="text-xs text-white/70">Events Yearly</p>
+                  <p className="text-xs" style={{ color: 'var(--theme-primary)' }}>Events Yearly</p>
                 </div>
                 <div className="text-center backdrop-blur-md bg-[var(--theme-primary)]/5 border border-[var(--theme-primary)]/20 rounded-xl p-2">
                   <div className="flex justify-center mb-2">
                     <Award className="w-5 h-5 text-[var(--theme-primary)]" />
                   </div>
                   <p className="text-2xl font-semibold" style={{ color: 'var(--theme-primary)' }}>61+</p>
-                  <p className="text-xs text-white/70">Years of Legacy</p>
+                  <p className="text-xs" style={{ color: 'var(--theme-primary)' }}>Years of Legacy</p>
                 </div>
               </div>
             </div>

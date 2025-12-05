@@ -66,11 +66,11 @@ export function ChatSidebar({
     <div className="flex h-full w-full bg-white overflow-hidden">
       {/* Left Navigation Bar */}
       <div className={cn(
-        "flex shrink-0 flex-col border-r border-gray-200 bg-white transition-all duration-300",
+        "flex shrink-0 flex-col items-center border-l-4 border-l-cyan-500 border-r border-gray-200 bg-white transition-all duration-300",
         isNavExpanded ? "w-48" : "w-16"
       )}>
         {/* KVS Logo */}
-        <div className="flex items-center justify-center border-b border-gray-200 px-3 py-4">
+        <div className="flex items-center justify-center border-b border-gray-200 px-3 py-3.5">
           <div className={cn(
             "flex items-center gap-3",
             !isNavExpanded && "justify-center"
