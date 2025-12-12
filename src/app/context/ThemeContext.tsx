@@ -12,14 +12,18 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('cyan')
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme
-    if (savedTheme) {
-      setTheme(savedTheme)
+  // Initialize theme from localStorage immediately to prevent flash
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme') as Theme
+      if (savedTheme && ['blue', 'green', 'purple', 'orange', 'cyan'].includes(savedTheme)) {
+        // Apply theme immediately to prevent flash
+        document.documentElement.setAttribute('data-theme', savedTheme)
+        return savedTheme
+      }
     }
-  }, [])
+    return 'cyan'
+  })
 
   useEffect(() => {
     localStorage.setItem('theme', theme)

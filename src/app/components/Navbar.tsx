@@ -112,12 +112,12 @@ export function Navbar() {
             >
               Alumni in News
             </Link>
-            <Link 
+            {/* <Link 
               href="/chat" 
               className="text-black font-medium hover:scale-105 transition-all duration-300 cursor-pointer nav-link-hover"
             >
               Chat
-            </Link>
+            </Link> */}
             {/* Login button */}
             <button
               onClick={() => router.push('/login')}

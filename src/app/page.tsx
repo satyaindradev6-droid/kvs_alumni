@@ -1,7 +1,7 @@
 "use client"
 
-import { HeroSection } from "./home/HeroSection"
-import HomePage from "./home/page"
+import { HeroSection } from "./landingpage/HeroSection"
+import HomePage from "./landingpage/page"
 
 export default function Home() {
   return (

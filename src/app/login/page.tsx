@@ -1,19 +1,121 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Design1Globe } from "../register/designGlobe"
-import { Mail, Lock, GraduationCap, Users, Calendar, Award } from "lucide-react"
+import { Mail, Lock, GraduationCap, Users, Calendar, Award, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
 export default function LoginPage() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [userType, setUserType] = useState<"student" | "employee">("student")
+  const [isLoading, setIsLoading] = useState(false)
+  const [showToast, setShowToast] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Read tab from URL on mount
+  useEffect(() => {
+    const tab = searchParams.get("tab")
+    if (tab === "employee") {
+      setUserType("employee")
+    }
+  }, [searchParams])
+
+  // Update URL when tab changes
+  const handleTabChange = (type: "student" | "employee") => {
+    setUserType(type)
+    if (type === "employee") {
+      router.push("/login?tab=employee", { scroll: false })
+    } else {
+      router.push("/login", { scroll: false })
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle login logic here
-    console.log("Login attempt:", { email, password })
+    setIsLoading(true)
+    setError("")
+
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${API_URL}/api/alumni/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, type: userType }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        // Log full response for debugging
+        console.log('Login response:', JSON.stringify(data, null, 2))
+        
+        // Handle nested alumni object from API response
+        const alumni = data.alumni || {}
+        
+        // Extract user data - check alumni object first, then root data
+        const userId = alumni.alumniId ?? alumni.alumni_id ?? alumni.id ?? data.alumniId ?? data.alumni_id ?? data.id
+        const userEmail = alumni.emailId ?? alumni.email_id ?? alumni.email ?? data.emailId ?? data.email_id ?? data.email
+        const userName = alumni.name ?? data.name
+        const userToken = alumni.token ?? data.token ?? ''
+        
+        console.log('Extracted values:', { userId, userEmail, userName, userToken: userToken ? 'exists' : 'missing' })
+        
+        localStorage.setItem('token', userToken)
+        localStorage.setItem('user', JSON.stringify({
+          id: userId,
+          email: userEmail,
+          name: userName,
+          type: userType,
+        }))
+        console.log('Stored user:', { id: userId, email: userEmail, name: userName, type: userType })
+
+        // Fetch full user profile using the alumniId
+        if (userId) {
+          try {
+            const profileResponse = await fetch(`${API_URL}/api/alumni/${userId}`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userToken}`,
+              },
+            })
+            const profileData = await profileResponse.json()
+            console.log('User profile API response:', profileData)
+            
+            // Store full profile in localStorage
+            if (profileResponse.ok) {
+              const fullProfile = profileData.alumni || profileData
+              localStorage.setItem('userProfile', JSON.stringify(fullProfile))
+              console.log('Full user profile stored:', fullProfile)
+            }
+          } catch (profileErr) {
+            console.error('Error fetching profile:', profileErr)
+          }
+        }
+
+        // Show success toast
+        setShowToast(true)
+
+        // Redirect after 1.5 seconds
+        setTimeout(() => {
+          window.location.href = '/home'
+        }, 1500)
+      } else {
+        setError(data.message || 'Login failed')
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.')
+      console.error('Login error:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -85,6 +187,32 @@ export default function LoginPage() {
                 <p className="text-gray-500 text-lg lg:text-xl">Login with Email</p>
               </div>
 
+              {/* User Type Tabs */}
+              <div className="flex mb-6 bg-gray-100 rounded-xl p-1">
+                <button
+                  type="button"
+                  onClick={() => handleTabChange("student")}
+                  className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${
+                    userType === "student"
+                      ? "bg-[var(--theme-primary)] text-white shadow-md"
+                      : "text-gray-600 hover:text-gray-800"
+                  }`}
+                >
+                  Alumni
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleTabChange("employee")}
+                  className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${
+                    userType === "employee"
+                      ? "bg-[var(--theme-primary)] text-white shadow-md"
+                      : "text-gray-600 hover:text-gray-800"
+                  }`}
+                >
+                  Ex-Employee
+                </button>
+              </div>
+
               {/* Login Form */}
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Email Input */}
@@ -100,7 +228,7 @@ export default function LoginPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="thisuix@mail.com"
+                      placeholder="Email"
                       className="w-full pl-12 pr-4 py-4 text-base border-2 border-[var(--theme-primary)] rounded-xl focus:outline-none focus:border-[var(--theme-primary2)] transition-colors text-gray-700"
                       required
                     />
@@ -120,12 +248,19 @@ export default function LoginPage() {
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="****************"
+                      placeholder="Password"
                       className="w-full pl-12 pr-4 py-4 text-base border-2 border-[var(--theme-primary)] rounded-xl focus:outline-none focus:border-[var(--theme-primary2)] transition-colors text-gray-700"
                       required
                     />
                   </div>
                 </div>
+
+                {/* Error Message */}
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
+                    {error}
+                  </div>
+                )}
 
                 {/* Forgot Password */}
                 <div className="text-right">
@@ -137,9 +272,10 @@ export default function LoginPage() {
                 {/* Login Button */}
                 <button
                   type="submit"
-                  className="w-full bg-[var(--theme-primary)] hover:bg-[var(--theme-primary2)] text-white font-semibold py-3 text-base rounded-xl transition-colors shadow-lg shadow-[var(--theme-primary)]/30"
+                  disabled={isLoading}
+                  className="w-full bg-[var(--theme-primary)] hover:bg-[var(--theme-primary2)] text-white font-semibold py-3 text-base rounded-xl transition-colors shadow-lg shadow-[var(--theme-primary)]/30 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  LOGIN
+                  {isLoading ? 'Logging in...' : 'LOGIN'}
                 </button>
 
                 {/* Divider */}
@@ -166,6 +302,16 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* Success Toast */}
+      {showToast && (
+        <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
+          <div className="flex items-center gap-3 bg-green-500 text-white px-5 py-3 rounded-lg shadow-lg">
+            <CheckCircle className="w-5 h-5" />
+            <span className="font-medium">Login Successful!</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

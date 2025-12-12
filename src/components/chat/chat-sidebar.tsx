@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Home, MessageCircle, Calendar, Archive, Settings, Plus, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Sidebar } from "@/components/chat/sidebar"
 import { cn } from "@/lib/utils"
 import type { Conversation, User } from "@/lib/chat-data"
 
@@ -54,93 +55,10 @@ export function ChatSidebar({
     return searchName.toLowerCase().includes(searchQuery.toLowerCase())
   })
 
-  const navItems = [
-    { id: "home", icon: Home, label: "Home" },
-    { id: "chats", icon: MessageCircle, label: "Chats" },
-    { id: "calendar", icon: Calendar, label: "Calendar" },
-    { id: "search", icon: Search, label: "Search" },
-    { id: "archive", icon: Archive, label: "Archive" },
-  ]
-
   return (
     <div className="flex h-full w-full bg-white overflow-hidden">
-      {/* Left Navigation Bar */}
-      <div className={cn(
-        "flex shrink-0 flex-col items-center border-l-4 border-l-cyan-500 border-r border-gray-200 bg-white transition-all duration-300",
-        isNavExpanded ? "w-48" : "w-16"
-      )}>
-        {/* KVS Logo */}
-        <div className="flex items-center justify-center border-b border-gray-200 px-3 py-3.5">
-          <div className={cn(
-            "flex items-center gap-3",
-            !isNavExpanded && "justify-center"
-          )}>
-            <img 
-              src="/images/logo.png" 
-              alt="KVS Logo" 
-              className="h-10 w-10 shrink-0 object-contain"
-            />
-            {isNavExpanded && (
-              <span className="font-semibold text-gray-900">KVS Alumni</span>
-            )}
-          </div>
-        </div>
+      {/* Left Navigation Bar - Extracted to Sidebar component */}
         
-        <nav className="flex flex-col gap-2 px-3 py-4">
-          {navItems.map((item) => {
-            const Icon = item.icon
-            const isActive = activeNav === item.id
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveNav(item.id)}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors",
-                  isActive ? "bg-cyan-50 text-cyan-600" : "text-gray-600 hover:bg-gray-50",
-                  !isNavExpanded && "justify-center"
-                )}
-              >
-                <Icon className={cn(
-                  "h-5 w-5 shrink-0",
-                  isActive && "text-cyan-500"
-                )} />
-                {isNavExpanded && (
-                  <span className={cn(
-                    "text-sm font-medium",
-                    isActive && "text-cyan-600"
-                  )}>
-                    {item.label}
-                  </span>
-                )}
-              </button>
-            )
-          })}
-        </nav>
-
-        <div className="mt-auto px-3">
-          <button
-            onClick={() => setActiveNav("settings")}
-            className={cn(
-              "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-colors",
-              activeNav === "settings" ? "bg-cyan-50 text-cyan-600" : "text-gray-600 hover:bg-gray-50",
-              !isNavExpanded && "justify-center"
-            )}
-          >
-            <Settings className={cn(
-              "h-5 w-5 shrink-0",
-              activeNav === "settings" && "text-cyan-500"
-            )} />
-            {isNavExpanded && (
-              <span className={cn(
-                "text-sm font-medium",
-                activeNav === "settings" && "text-cyan-600"
-              )}>
-                Settings
-              </span>
-            )}
-          </button>
-        </div>
-      </div>
 
       {/* Chat List */}
       <div className="flex flex-1 flex-col min-w-0 overflow-hidden">

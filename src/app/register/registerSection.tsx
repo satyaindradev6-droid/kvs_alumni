@@ -14,10 +14,11 @@ import {
 } from "@/components/ui/select"
 import { useAppDispatch, useAppSelector } from "@/redux/hooks"
 import { updateRegistrationField, registerAlumni } from "@/redux/slices/alumniSlice"
+import { updateEmployeeField, registerEmployee } from "@/redux/slices/employeeSlice"
 import { fetchStates, fetchSchoolsByState, clearSchools } from "@/redux/slices/locationSlice"
 import { useRouter } from "next/navigation"
-import { alumniRegistrationSchema, exEmployeeRegistrationSchema, photoSchema } from "@/lib/validations"
-import { z } from "zod"
+import Link from "next/link"
+
 
 const inputClassName = "h-12 bg-white border-2 border-[var(--theme-primary)] rounded-lg focus:ring-[var(--theme-primary)] focus:border-[var(--theme-primary)] text-gray-700"
 const inputErrorClassName = "h-12 bg-white border-2 border-red-500 rounded-lg focus:ring-red-500 focus:border-red-500 text-gray-700"
@@ -25,13 +26,31 @@ const labelClassName = "text-sm text-[var(--theme-primary)]"
 
 type ValidationErrors = Record<string, string>
 
+const TAB_STORAGE_KEY = 'kvs_registration_tab'
+
 export function RegisterSection() {
   const dispatch = useAppDispatch()
   const router = useRouter()
-  const { registration, loading, error } = useAppSelector((state) => state.alumni)
+  
+  // Initialize userType from localStorage or default to "alumni"
+  const [userType, setUserType] = useState<"alumni" | "ex-employee">(() => {
+    if (typeof window !== 'undefined') {
+      const savedTab = localStorage.getItem(TAB_STORAGE_KEY)
+      if (savedTab === 'alumni' || savedTab === 'ex-employee') {
+        return savedTab
+      }
+    }
+    return "alumni"
+  })
+  
+  const { registration: alumniRegistration, loading: alumniLoading, error: alumniError } = useAppSelector((state) => state.alumni)
+  const { registration: employeeRegistration, loading: employeeLoading, error: employeeError } = useAppSelector((state) => state.employee)
   const { states, schools, statesLoading, schoolsLoading } = useAppSelector((state) => state.location)
   
-  const [userType, setUserType] = useState<"alumni" | "ex-employee">("alumni")
+  // Use the appropriate registration based on userType
+  const registration = userType === "alumni" ? alumniRegistration : employeeRegistration
+  const loading = userType === "alumni" ? alumniLoading : employeeLoading
+  const error = userType === "alumni" ? alumniError : employeeError
   const [fileName, setFileName] = useState("")
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false)
@@ -53,7 +72,7 @@ export function RegisterSection() {
   }, [registration.state_id, dispatch])
 
   const [photoFile, setPhotoFile] = useState<File | null>(null)
-  const [photoBase64, setPhotoBase64] = useState<string>('')
+
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -61,57 +80,126 @@ export function RegisterSection() {
       setFileName(file.name)
       setPhotoFile(file)
       
-      // Convert to base64 for JSON submission
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPhotoBase64(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+
     }
   }, [])
 
   const handleInputChange = useCallback((field: string, value: any) => {
-    dispatch(updateRegistrationField({ field: field as any, value }))
-  }, [dispatch])
+    if (userType === "alumni") {
+      dispatch(updateRegistrationField({ field: field as any, value }))
+    } else {
+      dispatch(updateEmployeeField({ field: field as any, value }))
+    }
+  }, [dispatch, userType])
 
   const handleStateChange = useCallback((value: string) => {
-    dispatch(updateRegistrationField({ field: 'state_id' as any, value: parseInt(value) }))
-    dispatch(updateRegistrationField({ field: 'school_id' as any, value: undefined }))
-  }, [dispatch])
+    if (userType === "alumni") {
+      dispatch(updateRegistrationField({ field: 'state_id' as any, value: parseInt(value) }))
+      dispatch(updateRegistrationField({ field: 'school_id' as any, value: undefined }))
+    } else {
+      dispatch(updateEmployeeField({ field: 'stateid' as any, value: parseInt(value) }))
+      dispatch(updateEmployeeField({ field: 'organizerid' as any, value: undefined }))
+    }
+  }, [dispatch, userType])
 
   const validateForm = useCallback(() => {
     const errors: ValidationErrors = {}
     
-    try {
-      const schema = userType === "alumni" ? alumniRegistrationSchema : exEmployeeRegistrationSchema
-      schema.parse(registration)
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        const zodError = err as z.ZodError<unknown>
-        zodError.issues.forEach((issue) => {
-          const field = issue.path[0] as string
-          errors[field] = issue.message
-        })
+    if (userType === "ex-employee") {
+      // Ex-Employee validation
+      const empReg = employeeRegistration
+      
+      if (!empReg.name || empReg.name.trim() === '') {
+        errors.name = 'Name is required'
       }
-    }
-
-    // Validate photo
-    if (photoFile) {
-      try {
-        photoSchema.parse(photoFile)
-      } catch (err) {
-        if (err instanceof z.ZodError) {
-          const zodError = err as z.ZodError<unknown>
-          errors.photo = zodError.issues[0].message
-        }
+      
+      if (!empReg.fathername || empReg.fathername.trim() === '') {
+        errors.fathername = 'Father Name is required'
+      }
+      
+      if (!empReg.mobileno || empReg.mobileno.trim() === '') {
+        errors.mobileno = 'Mobile Number is required'
+      } else if (!/^[0-9]{10}$/.test(empReg.mobileno)) {
+        errors.mobileno = 'Mobile Number must be 10 digits'
+      }
+      
+      if (!empReg.emailid || empReg.emailid.trim() === '') {
+        errors.emailid = 'Email ID is required'
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(empReg.emailid)) {
+        errors.emailid = 'Please enter a valid email address'
+      }
+      
+      if (!empReg.empcode || empReg.empcode.trim() === '') {
+        errors.empcode = 'Employee Code is required'
+      }
+      
+      if (!empReg.tcyear) {
+        errors.tcyear = 'Retirement Year is required'
+      }
+      
+      if (!empReg.organizerid) {
+        errors.organizerid = 'Retired From is required'
+      }
+      
+      if (!empReg.organization || empReg.organization.trim() === '') {
+        errors.organization = 'Organization is required'
+      }
+      
+      // Photo validation for ex-employee
+      if (!photoFile) {
+        errors.photo = 'Upload Photo is required'
       }
     } else {
-      errors.photo = "Upload Photo is required"
+      // Alumni validation
+      const alReg = alumniRegistration
+      
+      if (!alReg.name || alReg.name.trim() === '') {
+        errors.name = 'Name is required'
+      }
+      
+      if (!alReg.father_name || alReg.father_name.trim() === '') {
+        errors.father_name = 'Father Name is required'
+      }
+      
+      if (!alReg.mobile_no || alReg.mobile_no.trim() === '') {
+        errors.mobile_no = 'Mobile Number is required'
+      } else if (!/^[0-9]{10}$/.test(alReg.mobile_no)) {
+        errors.mobile_no = 'Mobile Number must be 10 digits'
+      }
+      
+      if (!alReg.email_id || alReg.email_id.trim() === '') {
+        errors.email_id = 'Email ID is required'
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(alReg.email_id)) {
+        errors.email_id = 'Please enter a valid email address'
+      }
+      
+      if (!alReg.state_id) {
+        errors.state_id = 'State is required'
+      }
+      
+      if (!alReg.school_id) {
+        errors.school_id = 'School is required'
+      }
+      
+      if (!alReg.tc_year) {
+        errors.tc_year = 'Year of Issue of TC is required'
+      }
+      
+      if (!alReg.tc_class || alReg.tc_class.trim() === '') {
+        errors.tc_class = 'Class is required'
+      }
+      
+      // admission_no is optional - no validation needed
+      
+      // Photo validation for alumni
+      if (!photoFile) {
+        errors.photo = 'Upload Photo is required'
+      }
     }
 
     setValidationErrors(errors)
     return Object.keys(errors).length === 0
-  }, [registration, photoFile, userType])
+  }, [alumniRegistration, employeeRegistration, photoFile, userType])
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
@@ -122,34 +210,71 @@ export function RegisterSection() {
     }
 
     try {
-      // Create FormData with all fields
       const formData = new FormData()
       
-      // Add all form fields
-      formData.append('name', registration.name)
-      formData.append('father_name', registration.father_name || '')
-      formData.append('mobile_number', registration.mobile_no || '')
-      formData.append('email_id', registration.email_id)
+      if (userType === "alumni") {
+        // Alumni registration fields
+        formData.append('name', registration.name)
+        formData.append('father_name', registration.father_name || '')
+        formData.append('mobile_number', registration.mobile_no || '')
+        formData.append('email_id', registration.email_id)
+        
+        if (registration.state_id) formData.append('state_id', registration.state_id.toString())
+        if (registration.school_id) formData.append('school_id', registration.school_id.toString())
+        if (registration.tc_year) formData.append('tc_year', registration.tc_year.toString())
+        if (registration.tc_class) formData.append('tc_class', registration.tc_class)
+        if (registration.admission_no) formData.append('admission_no', registration.admission_no)
+        if (registration.ro_id) formData.append('ro_id', registration.ro_id.toString())
+        
+        formData.append('public_display', registration.public_display !== false ? 'true' : 'false')
+        formData.append('photo', photoFile!)
+        
+        await dispatch(registerAlumni(formData)).unwrap()
+      } else {
+        // Employee registration fields
+        const empReg = employeeRegistration
+        formData.append('name', empReg.name)
+        formData.append('fathername', empReg.fathername)
+        formData.append('mobileno', empReg.mobileno)
+        formData.append('emailid', empReg.emailid)
+        formData.append('empcode', empReg.empcode)
+        formData.append('tcyear', empReg.tcyear.toString())
+        // Password not sent - will be handled by backend
+        formData.append('gender', empReg.gender)
+        formData.append('dob', empReg.dob || '1970-01-01')
+        
+        if (empReg.weddinganniversary) formData.append('weddinganniversary', empReg.weddinganniversary)
+        
+        formData.append('add1', empReg.add1)
+        formData.append('add2', empReg.add2)
+        formData.append('add3', empReg.add3)
+        formData.append('add4', empReg.add4)
+        formData.append('aboutme', empReg.aboutme)
+        
+        if (empReg.facebook) formData.append('facebook', empReg.facebook)
+        if (empReg.twitter) formData.append('twitter', empReg.twitter)
+        if (empReg.linkedin) formData.append('linkedin', empReg.linkedin)
+        if (empReg.whatsapp) formData.append('whatsapp', empReg.whatsapp)
+        if (empReg.blog) formData.append('blog', empReg.blog)
+        
+        formData.append('tcclass', empReg.tcclass)
+        formData.append('contribution', empReg.contribution)
+        formData.append('stateid', empReg.stateid.toString())
+        formData.append('organization', empReg.organization)
+        formData.append('organizerid', empReg.organizerid.toString())
+        formData.append('userid', empReg.userid)
+        
+        if (empReg.note) formData.append('note', empReg.note)
+        if (photoFile) formData.append('photo', photoFile)
+        
+        await dispatch(registerEmployee(formData)).unwrap()
+      }
       
-      // Add optional fields
-      if (registration.state_id) formData.append('state_id', registration.state_id.toString())
-      if (registration.school_id) formData.append('school_id', registration.school_id.toString())
-      if (registration.tc_year) formData.append('tc_year', registration.tc_year.toString())
-      if (registration.tc_class) formData.append('tc_class', registration.tc_class)
-      if (registration.admission_no) formData.append('admission_no', registration.admission_no)
-      if (registration.ro_id) formData.append('ro_id', registration.ro_id.toString())
-      
-      formData.append('public_display', registration.public_display !== false ? 'true' : 'false')
-      
-      // Add the photo file
-      formData.append('photo', photoFile!)
-      
-      await dispatch(registerAlumni(formData)).unwrap()
       router.push('/register/success')
     } catch (err) {
       console.error('Registration failed:', err)
     }
-  }, [dispatch, registration, photoFile, router, validateForm])
+  }, [dispatch, registration, employeeRegistration, photoFile, router, validateForm, userType])
 
   const years = useMemo(() => 
     Array.from({ length: 60 }, (_, i) => new Date().getFullYear() - i),
@@ -162,9 +287,24 @@ export function RegisterSection() {
   )
 
   const retirementYears = useMemo(() => 
-    Array.from({ length: 50 }, (_, i) => 2024 - i),
+    Array.from({ length: 60 }, (_, i) => {
+      const startYear = 1967 + i
+      const endYear = (startYear + 1) % 100 // Get last 2 digits of next year
+      return {
+        value: startYear,
+        label: `${startYear} - ${endYear.toString().padStart(2, '0')}`
+      }
+    }),
     []
   )
+
+  // Handle tab change with localStorage persistence
+  const handleTabChange = useCallback((tab: "alumni" | "ex-employee") => {
+    setUserType(tab)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(TAB_STORAGE_KEY, tab)
+    }
+  }, [])
 
   return (
     <div className="space-y-4">
@@ -172,7 +312,7 @@ export function RegisterSection() {
       <div className="flex gap-0 rounded-full border-2 border-[var(--theme-primary)] overflow-hidden w-fit ml-auto">
         <button
           type="button"
-          onClick={() => setUserType("alumni")}
+          onClick={() => handleTabChange("alumni")}
           className={`px-6 py-1.5 text-sm font-medium transition-all duration-300 ${
             userType === "alumni"
               ? "bg-[var(--theme-primary)] text-white"
@@ -183,7 +323,7 @@ export function RegisterSection() {
         </button>
         <button
           type="button"
-          onClick={() => setUserType("ex-employee")}
+          onClick={() => handleTabChange("ex-employee")}
           className={`px-6 py-1.5 text-sm font-medium transition-all duration-300 ${
             userType === "ex-employee"
               ? "bg-[var(--theme-primary)] text-white"
@@ -232,7 +372,7 @@ export function RegisterSection() {
             <Input
               id="name"
               type="text"
-              value={registration.name}
+              value={userType === "alumni" ? alumniRegistration.name : employeeRegistration.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
               className={hasAttemptedSubmit && validationErrors.name ? inputErrorClassName : inputClassName}
             />
@@ -244,11 +384,11 @@ export function RegisterSection() {
             <Input
               id="fatherName"
               type="text"
-              value={registration.father_name || ''}
-              onChange={(e) => handleInputChange('father_name', e.target.value)}
-              className={hasAttemptedSubmit && validationErrors.father_name ? inputErrorClassName : inputClassName}
+              value={userType === "alumni" ? (alumniRegistration.father_name || '') : employeeRegistration.fathername}
+              onChange={(e) => handleInputChange(userType === "alumni" ? 'father_name' : 'fathername', e.target.value)}
+              className={hasAttemptedSubmit && (validationErrors.father_name || validationErrors.fathername) ? inputErrorClassName : inputClassName}
             />
-            {hasAttemptedSubmit && validationErrors.father_name && <p className="text-xs text-red-500">{validationErrors.father_name}</p>}
+            {hasAttemptedSubmit && (validationErrors.father_name || validationErrors.fathername) && <p className="text-xs text-red-500">{validationErrors.father_name || validationErrors.fathername}</p>}
           </div>
 
           <div className="space-y-1.5">
@@ -256,11 +396,11 @@ export function RegisterSection() {
             <Input
               id="mobile"
               type="tel"
-              value={registration.mobile_no || ''}
-              onChange={(e) => handleInputChange('mobile_no', e.target.value)}
-              className={hasAttemptedSubmit && validationErrors.mobile_no ? inputErrorClassName : inputClassName}
+              value={userType === "alumni" ? (alumniRegistration.mobile_no || '') : employeeRegistration.mobileno}
+              onChange={(e) => handleInputChange(userType === "alumni" ? 'mobile_no' : 'mobileno', e.target.value)}
+              className={hasAttemptedSubmit && (validationErrors.mobile_no || validationErrors.mobileno) ? inputErrorClassName : inputClassName}
             />
-            {hasAttemptedSubmit && validationErrors.mobile_no && <p className="text-xs text-red-500">{validationErrors.mobile_no}</p>}
+            {hasAttemptedSubmit && (validationErrors.mobile_no || validationErrors.mobileno) && <p className="text-xs text-red-500">{validationErrors.mobile_no || validationErrors.mobileno}</p>}
           </div>
         </div>
 
@@ -392,92 +532,91 @@ export function RegisterSection() {
             {/* Row 2: Email ID, Employee Code, Retirement Year */}
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-sm text-[var(--theme-primary)]">
+                <Label htmlFor="email" className={labelClassName}>
                   Email ID
                 </Label>
                 <Input
                   id="email"
                   type="email"
-                  value={registration.email_id}
-                  onChange={(e) => handleInputChange('email_id', e.target.value)}
-                  className="h-12 bg-white border-2 border-[var(--theme-primary)] rounded-lg focus:ring-[var(--theme-primary)] focus:border-[var(--theme-primary)] text-gray-700"
-                  required
+                  value={employeeRegistration.emailid}
+                  onChange={(e) => handleInputChange('emailid', e.target.value)}
+                  className={hasAttemptedSubmit && validationErrors.emailid ? inputErrorClassName : inputClassName}
                 />
+                {hasAttemptedSubmit && validationErrors.emailid && <p className="text-xs text-red-500">{validationErrors.emailid}</p>}
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="employeeCode" className="text-sm text-[var(--theme-primary)]">
+                <Label htmlFor="employeeCode" className={labelClassName}>
                   Employee Code
                 </Label>
                 <Input
                   id="employeeCode"
                   type="text"
-                  value={registration.admission_no || ''}
-                  onChange={(e) => handleInputChange('admission_no', e.target.value)}
-                  className="h-12 bg-white border-2 border-[var(--theme-primary)] rounded-lg focus:ring-[var(--theme-primary)] focus:border-[var(--theme-primary)] text-gray-700"
+                  value={employeeRegistration.empcode}
+                  onChange={(e) => handleInputChange('empcode', e.target.value)}
+                  className={hasAttemptedSubmit && validationErrors.empcode ? inputErrorClassName : inputClassName}
                 />
+                {hasAttemptedSubmit && validationErrors.empcode && <p className="text-xs text-red-500">{validationErrors.empcode}</p>}
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="retirementYear" className="text-sm text-[var(--theme-primary)]">
+                <Label htmlFor="retirementYear" className={labelClassName}>
                   Retirement Year
                 </Label>
                 <Select
-                  value={registration.tc_year?.toString()}
-                  onValueChange={(value) => handleInputChange('tc_year', parseInt(value))}
+                  value={employeeRegistration.tcyear?.toString()}
+                  onValueChange={(value) => handleInputChange('tcyear', parseInt(value))}
                 >
-                  <SelectTrigger className="h-12 bg-white border-2 border-[var(--theme-primary)] rounded-lg focus:ring-[var(--theme-primary)] focus:border-[var(--theme-primary)] text-gray-700">
-                    <SelectValue />
+                  <SelectTrigger className={hasAttemptedSubmit && validationErrors.tcyear ? inputErrorClassName : inputClassName}>
+                    <SelectValue placeholder="Select Year" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-60 overflow-y-auto">
                     {retirementYears.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}-{year + 1}
+                      <SelectItem key={year.value} value={year.value.toString()}>
+                        {year.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                {hasAttemptedSubmit && validationErrors.tcyear && <p className="text-xs text-red-500">{validationErrors.tcyear}</p>}
               </div>
             </div>
 
             {/* Row 3: Retired From, Organization */}
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="retiredFrom" className="text-sm text-[var(--theme-primary)]">
+                <Label htmlFor="retiredFrom" className={labelClassName}>
                   Retired From
                 </Label>
                 <Select
-                  value={registration.ro_id?.toString()}
-                  onValueChange={(value) => handleInputChange('ro_id', parseInt(value))}
+                  value={employeeRegistration.organizerid?.toString()}
+                  onValueChange={(value) => handleInputChange('organizerid', parseInt(value))}
                 >
-                  <SelectTrigger className="h-12 bg-white border-2 border-[var(--theme-primary)] rounded-lg focus:ring-[var(--theme-primary)] focus:border-[var(--theme-primary)] text-gray-700">
-                    <SelectValue />
+                  <SelectTrigger className={hasAttemptedSubmit && validationErrors.organizerid ? inputErrorClassName : inputClassName}>
+                    <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">RO</SelectItem>
-                    <SelectItem value="2">KVS</SelectItem>
-                    <SelectItem value="3">Other</SelectItem>
+                    <SelectItem value="1">HQ</SelectItem>
+                    <SelectItem value="2">ZIET</SelectItem>
+                    <SelectItem value="3">RO</SelectItem>
+                    <SelectItem value="4">KV</SelectItem>
                   </SelectContent>
                 </Select>
+                {hasAttemptedSubmit && validationErrors.organizerid && <p className="text-xs text-red-500">{validationErrors.organizerid}</p>}
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="organization" className="text-sm text-[var(--theme-primary)]">
+                <Label htmlFor="organization" className={labelClassName}>
                   Organization
                 </Label>
-                <Select
-                  value={registration.school_id?.toString()}
-                  onValueChange={(value) => handleInputChange('school_id', parseInt(value))}
-                >
-                  <SelectTrigger className="h-12 bg-white border-2 border-[var(--theme-primary)] rounded-lg focus:ring-[var(--theme-primary)] focus:border-[var(--theme-primary)] text-gray-700">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">KVS Bhopal</SelectItem>
-                    <SelectItem value="2">KVS Indore</SelectItem>
-                    <SelectItem value="3">KVS Delhi</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input
+                  id="organization"
+                  type="text"
+                  value={employeeRegistration.organization}
+                  onChange={(e) => handleInputChange('organization', e.target.value)}
+                  className={hasAttemptedSubmit && validationErrors.organization ? inputErrorClassName : inputClassName}
+                />
+                {hasAttemptedSubmit && validationErrors.organization && <p className="text-xs text-red-500">{validationErrors.organization}</p>}
               </div>
             </div>
           </>

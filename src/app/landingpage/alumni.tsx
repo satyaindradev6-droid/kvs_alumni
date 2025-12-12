@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import Link from "next/link"
 
 const alumniImages = [
   "/images/alumni/Mask group (2).png",
