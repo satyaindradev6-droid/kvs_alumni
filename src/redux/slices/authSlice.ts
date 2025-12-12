@@ -27,6 +27,10 @@ interface LoginResponse {
   type: 'student' | 'employee';
 }
 
+interface ForgotPasswordRequest {
+  email: string;
+}
+
 // Helper to get initial state from localStorage
 const getInitialState = (): AuthState => {
   if (typeof window !== 'undefined') {
@@ -130,6 +134,34 @@ export const fetchUser = createAsyncThunk(
   }
 );
 
+// Async thunk for forgot password
+export const forgotPassword = createAsyncThunk(
+  'auth/forgotPassword',
+  async (request: ForgotPasswordRequest, { rejectWithValue }) => {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      
+      const response = await fetch(`${apiUrl}/api/alumni/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return rejectWithValue(result.message || result.error || 'Failed to send reset email');
+      }
+
+      return result;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Network error');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: getInitialState(),
@@ -200,6 +232,18 @@ const authSlice = createSlice({
         state.loading = false;
       })
       .addCase(fetchUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Forgot password
+      .addCase(forgotPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(forgotPassword.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
