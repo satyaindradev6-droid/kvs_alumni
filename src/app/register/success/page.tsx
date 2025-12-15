@@ -2,11 +2,13 @@
 
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import MainLayout from "@/app/MainLayout"
 
 export default function RegistrationSuccess() {
   const router = useRouter()
 
   return (
+    <MainLayout>
     <div className="min-h-screen flex items-start justify-center m-5" style={{ backgroundColor: 'rgba(var(--theme-primary-rgb, 59, 130, 246), 0.1)' }}>
       {/* Card Container */}
       <div className="rounded-2xl shadow-2xl p-8 max-w-lg w-full" style={{ backgroundColor: 'var(--theme-primary)' }}>
@@ -82,5 +84,6 @@ export default function RegistrationSuccess() {
         </div>
       </div>
     </div>
+     </MainLayout>
   )
 }
