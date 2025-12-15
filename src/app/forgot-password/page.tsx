@@ -35,11 +35,6 @@ export default function ForgotPasswordPage() {
       if (response.ok) {
         setSuccess(true)
         setShowToast(true)
-        
-        // Auto redirect after 3 seconds
-        setTimeout(() => {
-          router.push('/login')
-        }, 3000)
       } else {
         setError(data.message || 'Failed to send reset email')
       }

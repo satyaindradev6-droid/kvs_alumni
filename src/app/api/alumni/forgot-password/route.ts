@@ -1,54 +1,63 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
+import { tryBackendRequest } from '@/lib/backend-client';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { email } = body
+    const body = await request.json();
+    const { email } = body;
 
     // Validate email
     if (!email) {
       return NextResponse.json(
         { message: 'Email is required' },
         { status: 400 }
-      )
+      );
     }
 
     // Email validation regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
         { message: 'Please enter a valid email address' },
         { status: 400 }
-      )
+      );
     }
 
-    // Here you would typically:
-    // 1. Check if the email exists in your database
-    // 2. Generate a password reset token
-    // 3. Send an email with the reset link
-    // 4. Store the token in your database with an expiration time
+    console.log('Forwarding forgot password request to backend');
 
-    // For now, we'll simulate a successful response
-    // In a real implementation, you would integrate with your backend API
-    
-    console.log(`Password reset requested for email: ${email}`)
-
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    return NextResponse.json(
-      { 
-        success: true,
-        message: 'If the email is valid, a new password has been sent.' 
+    // Try backend request with fallback
+    const { response: backendResponse, data: backendData } = await tryBackendRequest('/api/auth/forgot-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      { status: 200 }
-    )
+      body: JSON.stringify({ email }),
+    });
+
+    if (!backendResponse.ok) {
+      return NextResponse.json(
+        { message: backendData.message || 'Password reset failed' },
+        { status: backendResponse.status }
+      );
+    }
+
+    // Return the backend response
+    return NextResponse.json(backendData, { status: backendResponse.status });
 
   } catch (error) {
-    console.error('Forgot password error:', error)
+    console.error('Forgot password API error:', error);
+    
+    // Check if it's a network error
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      return NextResponse.json(
+        { message: 'Backend server is not available on all endpoints. Please try again later.' },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }
-    )
+    );
   }
 }

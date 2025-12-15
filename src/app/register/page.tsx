@@ -4,10 +4,13 @@ import { GraduationCap, Users, Calendar, Award } from "lucide-react"
 import { Design1Globe } from "./designGlobe"
 // import { LoginForm } from "./loginPage"
 import { RegisterSection } from "./registerSection"
+import MainLayout from "../MainLayout"
 
 export default function Register() {
 
   return (
+
+     <MainLayout>
     <div className="min-h-screen bg-gradient-to-br">
       {/* Card Container */}
       <div className="w-full min-h-screen bg-white shadow-2xl overflow-hidden">
@@ -76,5 +79,6 @@ export default function Register() {
         </div>
       </div>
     </div>
+     </MainLayout>
   )
 }

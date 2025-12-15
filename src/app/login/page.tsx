@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Design1Globe } from "../register/designGlobe"
 import { Mail, Lock, GraduationCap, Users, Calendar, Award, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import MainLayout from "../MainLayout"
 
-export default function LoginPage() {
+function LoginContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [email, setEmail] = useState("")
@@ -313,5 +314,15 @@ export default function LoginPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">Loading...</div>}>
+       <MainLayout>
+      <LoginContent />
+       </ MainLayout>
+    </Suspense>
   )
 }

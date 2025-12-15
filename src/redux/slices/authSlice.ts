@@ -68,9 +68,7 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      
-      const response = await fetch(`${apiUrl}/api/alumni/login`, {
+      const response = await fetch('/api/alumni/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

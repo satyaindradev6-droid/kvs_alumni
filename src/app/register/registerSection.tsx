@@ -64,12 +64,16 @@ export function RegisterSection() {
 
   // Fetch schools when state changes
   useEffect(() => {
-    if (registration.state_id) {
-      dispatch(fetchSchoolsByState(registration.state_id))
+    const stateId = userType === "alumni" 
+      ? (registration as any).state_id 
+      : (registration as any).stateid;
+    
+    if (stateId) {
+      dispatch(fetchSchoolsByState(stateId))
     } else {
       dispatch(clearSchools())
     }
-  }, [registration.state_id, dispatch])
+  }, [userType === "alumni" ? (registration as any).state_id : (registration as any).stateid, dispatch, userType])
 
   const [photoFile, setPhotoFile] = useState<File | null>(null)
 
@@ -214,19 +218,20 @@ export function RegisterSection() {
       
       if (userType === "alumni") {
         // Alumni registration fields
-        formData.append('name', registration.name)
-        formData.append('father_name', registration.father_name || '')
-        formData.append('mobile_number', registration.mobile_no || '')
-        formData.append('email_id', registration.email_id)
+        const alumniReg = alumniRegistration
+        formData.append('name', alumniReg.name)
+        formData.append('father_name', alumniReg.father_name || '')
+        formData.append('mobile_number', alumniReg.mobile_no || '')
+        formData.append('email_id', alumniReg.email_id)
         
-        if (registration.state_id) formData.append('state_id', registration.state_id.toString())
-        if (registration.school_id) formData.append('school_id', registration.school_id.toString())
-        if (registration.tc_year) formData.append('tc_year', registration.tc_year.toString())
-        if (registration.tc_class) formData.append('tc_class', registration.tc_class)
-        if (registration.admission_no) formData.append('admission_no', registration.admission_no)
-        if (registration.ro_id) formData.append('ro_id', registration.ro_id.toString())
+        if (alumniReg.state_id) formData.append('state_id', alumniReg.state_id.toString())
+        if (alumniReg.school_id) formData.append('school_id', alumniReg.school_id.toString())
+        if (alumniReg.tc_year) formData.append('tc_year', alumniReg.tc_year.toString())
+        if (alumniReg.tc_class) formData.append('tc_class', alumniReg.tc_class)
+        if (alumniReg.admission_no) formData.append('admission_no', alumniReg.admission_no)
+        if (alumniReg.ro_id) formData.append('ro_id', alumniReg.ro_id.toString())
         
-        formData.append('public_display', registration.public_display !== false ? 'true' : 'false')
+        formData.append('public_display', alumniReg.public_display !== false ? 'true' : 'false')
         formData.append('photo', photoFile!)
         
         await dispatch(registerAlumni(formData)).unwrap()
@@ -414,9 +419,9 @@ export function RegisterSection() {
                 <Input
                   id="email"
                   type="email"
-                  value={registration.email_id}
-                  onChange={(e) => handleInputChange('email_id', e.target.value)}
-                  className={hasAttemptedSubmit && validationErrors.email_id ? inputErrorClassName : inputClassName}
+                  value={userType === "alumni" ? alumniRegistration.email_id : employeeRegistration.emailid}
+                  onChange={(e) => handleInputChange(userType === "alumni" ? 'email_id' : 'emailid', e.target.value)}
+                  className={hasAttemptedSubmit && (validationErrors.email_id || validationErrors.emailid) ? inputErrorClassName : inputClassName}
                 />
                 {hasAttemptedSubmit && validationErrors.email_id && <p className="text-xs text-red-500">{validationErrors.email_id}</p>}
               </div>
@@ -424,7 +429,7 @@ export function RegisterSection() {
               <div className="space-y-1.5">
                 <Label htmlFor="state" className={labelClassName}>State</Label>
                 <Select
-                  value={registration.state_id?.toString()}
+                  value={userType === "alumni" ? alumniRegistration.state_id?.toString() : employeeRegistration.stateid?.toString()}
                   onValueChange={handleStateChange}
                   disabled={statesLoading}
                 >
@@ -445,12 +450,12 @@ export function RegisterSection() {
               <div className="space-y-1.5">
                 <Label htmlFor="school" className={labelClassName}>Select School where last studied in KVS</Label>
                 <Select
-                  value={registration.school_id?.toString()}
+                  value={userType === "alumni" ? alumniRegistration.school_id?.toString() : ''}
                   onValueChange={(value) => handleInputChange('school_id', parseInt(value))}
-                  disabled={schoolsLoading || !registration.state_id}
+                  disabled={schoolsLoading || !(userType === "alumni" ? alumniRegistration.state_id : employeeRegistration.stateid)}
                 >
                   <SelectTrigger className={hasAttemptedSubmit && validationErrors.school_id ? inputErrorClassName : inputClassName}>
-                    <SelectValue placeholder={schoolsLoading ? "Loading..." : !registration.state_id ? "Select State first" : "Select School"} />
+                    <SelectValue placeholder={schoolsLoading ? "Loading..." : !(userType === "alumni" ? alumniRegistration.state_id : employeeRegistration.stateid) ? "Select State first" : "Select School"} />
                   </SelectTrigger>
                   <SelectContent>
                     {schools.map((school) => (
@@ -471,7 +476,7 @@ export function RegisterSection() {
                   Year of Issue of TC
                 </Label>
                 <Select
-                  value={registration.tc_year?.toString()}
+                  value={userType === "alumni" ? alumniRegistration.tc_year?.toString() : ''}
                   onValueChange={(value) => handleInputChange('tc_year', parseInt(value))}
                 >
                   <SelectTrigger className={hasAttemptedSubmit && validationErrors.tc_year ? inputErrorClassName : inputClassName}>
@@ -493,7 +498,7 @@ export function RegisterSection() {
                   Class Studied while taking TC
                 </Label>
                 <Select
-                  value={registration.tc_class || ''}
+                  value={userType === "alumni" ? (alumniRegistration.tc_class || '') : ''}
                   onValueChange={(value) => handleInputChange('tc_class', value)}
                 >
                   <SelectTrigger className={hasAttemptedSubmit && validationErrors.tc_class ? inputErrorClassName : inputClassName}>
@@ -517,7 +522,7 @@ export function RegisterSection() {
                 <Input
                   id="admission"
                   type="text"
-                  value={registration.admission_no || ''}
+                  value={userType === "alumni" ? (alumniRegistration.admission_no || '') : ''}
                   onChange={(e) => handleInputChange('admission_no', e.target.value)}
                   className={inputClassName}
                 />
