@@ -1,6 +1,12 @@
 NEXT_PUBLIC_API_URL=http://localhost:5000
 API_BASE_URL=http://localhost:5000
-API_BASE_URL_NETWORK=http://10.199.165.225:5000
+API_BASE_URL_NETWORK=http://localhost:5000
 DATABASE_URL="postgresql://username:password@localhost:5432/your_database_name"
 NEXTAUTH_SECRET=your-secret-key-here
 NEXTAUTH_URL=http://localhost:3000
+    # NEXT_PUBLIC_API_URL=http://10.199.165.225:5000
+    # API_BASE_URL=http://10.199.165.225:5000
+    # API_BASE_URL_NETWORK=http://10.199.165.225:5000
+    # DATABASE_URL="postgresql://username:password@localhost:5432/your_database_name"
+    # NEXTAUTH_SECRET=your-secret-key-here
+    # NEXTAUTH_URL=http://localhost:3000
