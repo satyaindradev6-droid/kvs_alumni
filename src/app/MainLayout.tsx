@@ -6,7 +6,7 @@ import { Navbar } from "./components/Navbar";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAppPage = pathname === "/chat" || pathname === "/home";
+  const isAppPage = pathname === "/chat" || pathname === "/home" || pathname === "/profile";
 
   if (isAppPage) {
     return <>{children}</>;

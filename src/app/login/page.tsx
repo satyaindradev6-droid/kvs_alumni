@@ -70,7 +70,7 @@ function LoginContent() {
         
         localStorage.setItem('token', userToken)
         localStorage.setItem('user', JSON.stringify({
-          id: userId,
+          id: userId, // This is now string format like "E1" for employees
           email: userEmail,
           name: userName,
           type: userType,

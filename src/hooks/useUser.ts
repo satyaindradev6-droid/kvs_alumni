@@ -1,46 +1,31 @@
-'use client';
-
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { fetchUserProfile, clearUserProfile, UserProfile } from '@/redux/slices/userSlice';
+import { fetchUserProfile, refreshUserProfile, clearUserProfile, invalidateProfile } from '@/redux/slices/userSlice';
+import type { UserProfile } from '@/redux/slices/userSlice';
 
-interface UseUserReturn {
-  user: UserProfile | null;
-  loading: boolean;
-  error: string | null;
-  isLoaded: boolean;
-  isLoggedIn: boolean;
-  refetch: () => void;
-  logout: () => void;
-}
-
-export function useUser(): UseUserReturn {
+export const useUser = () => {
   const dispatch = useAppDispatch();
   const { profile, loading, error, isLoaded } = useAppSelector((state) => state.user);
 
-  const isLoggedIn = typeof window !== 'undefined' && !!localStorage.getItem('token');
-
+  // Fetch user profile on hook initialization (only if not already loaded)
   useEffect(() => {
-    // Fetch user profile if logged in and not already loaded
-    if (isLoggedIn && !isLoaded && !loading) {
+    if (!isLoaded && !loading) {
       dispatch(fetchUserProfile());
     }
-  }, [dispatch, isLoggedIn, isLoaded, loading]);
+  }, [dispatch, isLoaded, loading]);
 
-  const refetch = () => {
-    dispatch(fetchUserProfile());
+  // Always fetch fresh data from API
+  const refetchUser = () => {
+    dispatch(refreshUserProfile());
   };
 
-  const logout = () => {
-    // Clear Redux state
+  // Invalidate cache and force refetch
+  const invalidateUser = () => {
+    dispatch(invalidateProfile());
+  };
+
+  const clearUser = () => {
     dispatch(clearUserProfile());
-    
-    // Clear localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    
-    // Redirect to login
-    window.location.href = '/login';
   };
 
   return {
@@ -48,10 +33,10 @@ export function useUser(): UseUserReturn {
     loading,
     error,
     isLoaded,
-    isLoggedIn,
-    refetch,
-    logout,
+    refetchUser,
+    invalidateUser,
+    clearUser,
   };
-}
+};
 
-export default useUser;
+export type { UserProfile };

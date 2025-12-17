@@ -1,10 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { Home, MessageCircle, Calendar, Search, Archive, Settings, User, LogOut } from "lucide-react"
+import { Home, MessageCircle, Calendar, Search, Archive } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 
 type SidebarProps = {
   isExpanded: boolean
@@ -21,17 +19,9 @@ const navItems = [
 ]
 
 export function Sidebar({ isExpanded, activeNav, onNavChange }: SidebarProps) {
-  const [showSettingsMenu, setShowSettingsMenu] = useState(false)
-  const router = useRouter()
-
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    router.push('/login')
-  }
   return (
     <div className={cn(
-      "flex shrink-0 flex-col items-center border-l-4 border-l-cyan-500 border-r border-gray-200 bg-white transition-all duration-300",
+      "flex shrink-0 flex-col items-center border-l-4 border-l-cyan-500 border-r border-gray-200 bg-white transition-all duration-300 min-h-screen",
       isExpanded ? "w-48" : "w-16"
     )}>
       {/* KVS Logo */}
@@ -51,7 +41,7 @@ export function Sidebar({ isExpanded, activeNav, onNavChange }: SidebarProps) {
         </div>
       </div>
       
-      <nav className="flex flex-col gap-2 px-3 py-4">
+      <nav className="flex flex-col gap-2 px-3 py-4 flex-1">
         {navItems.map((item) => {
           const Icon = item.icon
           const isActive = activeNav === item.id
@@ -83,53 +73,7 @@ export function Sidebar({ isExpanded, activeNav, onNavChange }: SidebarProps) {
         })}
       </nav>
 
-      <div className="mt-auto px-3 pb-4 relative">
-        <button
-          onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-          className={cn(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-colors",
-            showSettingsMenu ? "bg-cyan-50 text-cyan-600" : "text-gray-600 hover:bg-gray-50",
-            !isExpanded && "justify-center"
-          )}
-        >
-          <Settings className={cn(
-            "h-5 w-5 shrink-0",
-            showSettingsMenu && "text-cyan-500"
-          )} />
-          {isExpanded && (
-            <span className={cn(
-              "text-sm font-medium",
-              showSettingsMenu && "text-cyan-600"
-            )}>
-              Settings
-            </span>
-          )}
-        </button>
 
-        {/* Settings Dropdown Menu */}
-        {showSettingsMenu && (
-          <div className={cn(
-            "absolute bottom-full mb-2 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50",
-            isExpanded ? "left-0 right-0 mx-3" : "left-1/2 -translate-x-1/2 min-w-[140px]"
-          )}>
-            <Link
-              href="/profile"
-              onClick={() => setShowSettingsMenu(false)}
-              className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              <User className="h-4 w-4" />
-              <span className="text-sm font-medium">Profile</span>
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="flex w-full items-center gap-3 px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors"
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="text-sm font-medium">Logout</span>
-            </button>
-          </div>
-        )}
-      </div>
     </div>
   )
 }

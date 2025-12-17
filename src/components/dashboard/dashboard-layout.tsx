@@ -15,7 +15,7 @@ export function DashboardLayout({ children, title, activeNav = "home" }: Dashboa
   const [currentNav, setCurrentNav] = useState(activeNav)
 
   return (
-    <div className="flex h-dvh w-full bg-gray-50 overflow-hidden">
+    <div className="flex min-h-screen w-full bg-gray-50">
       {/* Sidebar */}
       <Sidebar
         isExpanded={isNavExpanded}
@@ -24,7 +24,7 @@ export function DashboardLayout({ children, title, activeNav = "home" }: Dashboa
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
         <TopBar
           title={title}
@@ -33,7 +33,7 @@ export function DashboardLayout({ children, title, activeNav = "home" }: Dashboa
         />
 
         {/* Page Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1">
           {children}
         </div>
       </div>
