@@ -4,6 +4,8 @@ import locationReducer from './slices/locationSlice';
 import employeeReducer from './slices/employeeSlice';
 import authReducer from './slices/authSlice';
 import userReducer from './slices/userSlice';
+import educationReducer from './slices/educationSlice';
+import experienceReducer from './slices/experienceSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +14,8 @@ export const store = configureStore({
     employee: employeeReducer,
     auth: authReducer,
     user: userReducer,
+    education: educationReducer,
+    experience: experienceReducer,
   },
 });
 

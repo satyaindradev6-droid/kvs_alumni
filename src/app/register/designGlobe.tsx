@@ -120,8 +120,8 @@ export function Design1Globe() {
   const { themeColor, themeColor2 } = useThemeColor()
 
   return (
-    <div className="w-full h-full bg-white">
-      <Canvas camera={{ position: [0, 0, 6], fov: 45 }}>
+    <div className="absolute inset-0 w-full h-full bg-white">
+      <Canvas camera={{ position: [0, 0, 6], fov: 45 }} style={{ width: '100%', height: '100%' }}>
         <ambientLight intensity={0.3} />
         <pointLight position={[10, 10, 10]} intensity={1} color={themeColor} />
         <Float speed={1} rotationIntensity={0.2} floatIntensity={0.3}>

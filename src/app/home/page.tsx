@@ -29,7 +29,8 @@ const upcomingEvents = [
 ]
 
 export default function HomePage() {
-  const { user, loading, error, isLoaded, isLoggedIn } = useUser()
+  const { user, loading, error, isLoaded } = useUser()
+  const isLoggedIn = !!user
 
   useEffect(() => {
     console.log('=== DASHBOARD USER DATA ===')
@@ -44,12 +45,10 @@ export default function HomePage() {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token')
       const userBasic = localStorage.getItem('user')
-      const userProfile = localStorage.getItem('userProfile')
       
       console.log('=== LOCALSTORAGE DATA ===')
       console.log('Token:', token ? 'exists' : 'missing')
       console.log('User Basic:', userBasic ? JSON.parse(userBasic) : 'missing')
-      console.log('User Profile:', userProfile ? JSON.parse(userProfile) : 'missing')
       console.log('========================')
     }
   }, [user, loading, error, isLoaded, isLoggedIn])

@@ -34,7 +34,7 @@ export function UserAvatar({
   className, 
   fallbackClassName 
 }: UserAvatarProps) {
-  const profileImageUrl = getProfileImageUrl(user?.profile_image)
+  const profileImageUrl = getProfileImageUrl(user?.profile_image ?? null)
   const userInitials = getInitials(user?.name)
 
   return (

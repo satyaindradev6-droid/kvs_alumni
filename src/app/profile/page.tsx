@@ -1,4 +1,4 @@
-"use client"
+  "use client"
 
 import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
@@ -8,16 +8,23 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { UserAvatar } from "@/components/ui/user-avatar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { User, Globe, Camera, Facebook, Twitter, Linkedin, MessageCircle, FileText, Heart, Users, CheckCircle } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { User, Globe, Camera, Facebook, Twitter, Linkedin, MessageCircle, FileText, Heart, Users, CheckCircle, GraduationCap, Briefcase } from "lucide-react"
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
 import { useUser } from "@/hooks/useUser"
 import { useAppDispatch, useAppSelector } from "@/redux/hooks"
 import { fetchStates } from "@/redux/slices/locationSlice"
+import { EducationSection } from "@/components/profile/education-section"
+import { ExperienceSection } from "@/components/profile/experience-section"
 
 export default function ProfilePage() {
+  const [activeTab, setActiveTab] = useState("profile")
   const [profileImage, setProfileImage] = useState<string | null>(null)
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
   const [showToast, setShowToast] = useState(false)
+  const [toastMessage, setToastMessage] = useState("Profile Updated Successfully!")
   const [error, setError] = useState("")
   const { user, refetchUser } = useUser()
   const dispatch = useAppDispatch()
@@ -29,6 +36,20 @@ export default function ProfilePage() {
   const [contribution, setContribution] = useState("")
   const [showcase, setShowcase] = useState("")
   const [selectedStateId, setSelectedStateId] = useState("")
+
+  // Load active tab from localStorage on mount
+  useEffect(() => {
+    const savedTab = localStorage.getItem('profileActiveTab')
+    if (savedTab && (savedTab === 'profile' || savedTab === 'education-experience')) {
+      setActiveTab(savedTab)
+    }
+  }, [])
+
+  // Save active tab to localStorage when it changes
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+    localStorage.setItem('profileActiveTab', value)
+  }
 
   // Fetch states on component mount
   useEffect(() => {
@@ -45,20 +66,102 @@ export default function ProfilePage() {
       setContribution(user.contribution || "")
       setShowcase(user.public_display || "")
       setSelectedStateId(user.state_id?.toString() || "")
-    }
-  }, [user])
-  
-  // Create a user object with uploaded image if available
-  const displayUser = profileImage ? { ...user, profile_image: profileImage } : user
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setProfileImage(reader.result as string)
+      // Set profile image from database if available
+      if (user.profile_image && !profileImage) {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const imageUrl = user.profile_image.startsWith('http') 
+          ? user.profile_image 
+          : `${apiUrl}${user.profile_image}`
+        setProfileImage(imageUrl)
       }
-      reader.readAsDataURL(file)
+    }
+  }, [user, profileImage])
+  
+  // Create a user object with uploaded image if available, otherwise use DB image
+  const displayUser = {
+    ...user,
+    profile_image: profileImage || user?.profile_image
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please select a valid image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image size should be less than 5MB')
+      return
+    }
+
+    // Show preview
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setProfileImage(reader.result as string)
+    }
+    reader.readAsDataURL(file)
+
+    // Store file for upload
+    setProfileImageFile(file)
+
+    // Upload immediately
+    await uploadProfileImage(file)
+  }
+
+  const uploadProfileImage = async (file: File) => {
+    setIsUploadingImage(true)
+    setError("")
+
+    try {
+      const token = localStorage.getItem('token')
+      
+      if (!token) {
+        setError('Please login again')
+        return
+      }
+
+      const formData = new FormData()
+      formData.append('photo', file)
+
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const endpoint = `${API_URL}/api/alumni/profile/photo`
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        // Update profile image with the returned path
+        if (data.profile_image) {
+          const imageUrl = data.profile_image.startsWith('http') 
+            ? data.profile_image 
+            : `${API_URL}${data.profile_image}`
+          setProfileImage(imageUrl)
+        }
+        // Refresh user profile data from API
+        refetchUser()
+        setToastMessage('Profile picture updated successfully!')
+        setShowToast(true)
+        setTimeout(() => setShowToast(false), 3000)
+      } else {
+        setError(data.message || 'Failed to upload profile picture')
+      }
+    } catch (err) {
+      setError('An error occurred while uploading image. Please try again.')
+      console.error('Image upload error:', err)
+    } finally {
+      setIsUploadingImage(false)
     }
   }
 
@@ -140,6 +243,7 @@ export default function ProfilePage() {
       if (response.ok) {
         // Refresh user profile data from API
         refetchUser()
+        setToastMessage('Profile Updated Successfully!')
         setShowToast(true)
         setTimeout(() => setShowToast(false), 3000)
       } else {
@@ -158,13 +262,28 @@ export default function ProfilePage() {
 
     <div className="p-6">
       <div className="mx-auto max-w-full">
-        {/* Header */}
-        {/* <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Profile Settings</h1>
-          <p className="mt-2 text-slate-600">Manage your personal information and preferences</p>
-        </div> */}
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="inline-flex h-12 items-center justify-start rounded-lg bg-white border border-slate-200 p-1 mb-6 gap-1 shadow-sm">
+            <TabsTrigger 
+              value="profile" 
+              className="inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-slate-50 data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm"
+            >
+              <User className="h-4 w-4" />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger 
+              value="education-experience" 
+              className="inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-slate-50 data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm"
+            >
+              <GraduationCap className="h-4 w-4" />
+              Education & Experience
+            </TabsTrigger>
+          </TabsList>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Profile Tab Content */}
+          <TabsContent value="profile">
+            <form onSubmit={handleSubmit} className="space-y-6">
           {/* Profile Image Card - Featured at top */}
           <Card className="border-0 shadow-lg bg-white overflow-hidden">
             <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 h-24" />
@@ -176,13 +295,25 @@ export default function ProfilePage() {
                     size="xl" 
                     className="border-4 border-white shadow-xl"
                   />
+                  {isUploadingImage && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                    </div>
+                  )}
                   <label
                     htmlFor="photo"
                     className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
                   >
                     <Camera className="h-6 w-6 text-white" />
                   </label>
-                  <Input id="photo" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                  <Input 
+                    id="photo" 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleImageUpload} 
+                    className="hidden"
+                    disabled={isUploadingImage}
+                  />
                 </div>
                 <div className="text-center sm:text-left sm:pb-2">
                   <h2 className="text-xl font-semibold text-slate-900">Profile Image</h2>
@@ -404,11 +535,38 @@ export default function ProfilePage() {
                       <SelectTrigger id="expertise" className="h-11 bg-slate-50 border-slate-200">
                         <SelectValue placeholder="Select Expertise" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Full Stack Development, React, Node.js">Full Stack Development</SelectItem>
-                        <SelectItem value="UI/UX Design">Design</SelectItem>
-                        <SelectItem value="Digital Marketing">Marketing</SelectItem>
-                        <SelectItem value="Business Development">Business</SelectItem>
+                      <SelectContent className="max-h-[300px]">
+                        <SelectItem value="government">Government</SelectItem>
+                        <SelectItem value="private">Private</SelectItem>
+                        <SelectItem value="it_software">IT & Software</SelectItem>
+                        <SelectItem value="banking_finance">Banking & Finance</SelectItem>
+                        <SelectItem value="engineering">Engineering</SelectItem>
+                        <SelectItem value="healthcare">Healthcare</SelectItem>
+                        <SelectItem value="education">Education</SelectItem>
+                        <SelectItem value="sales_marketing">Sales & Marketing</SelectItem>
+                        <SelectItem value="hr_admin">HR & Admin</SelectItem>
+                        <SelectItem value="accounting">Accounting</SelectItem>
+                        <SelectItem value="legal">Legal</SelectItem>
+                        <SelectItem value="design_creative">Design & Creative</SelectItem>
+                        <SelectItem value="media">Media</SelectItem>
+                        <SelectItem value="hospitality">Hospitality</SelectItem>
+                        <SelectItem value="tourism">Tourism</SelectItem>
+                        <SelectItem value="aviation">Aviation</SelectItem>
+                        <SelectItem value="logistics">Logistics</SelectItem>
+                        <SelectItem value="manufacturing">Manufacturing</SelectItem>
+                        <SelectItem value="construction">Construction</SelectItem>
+                        <SelectItem value="retail">Retail</SelectItem>
+                        <SelectItem value="customer_support">Customer Support</SelectItem>
+                        <SelectItem value="data_analytics">Data Analytics</SelectItem>
+                        <SelectItem value="cyber_security">Cyber Security</SelectItem>
+                        <SelectItem value="freelance">Freelance</SelectItem>
+                        <SelectItem value="remote">Remote</SelectItem>
+                        <SelectItem value="internship">Internship</SelectItem>
+                        <SelectItem value="startup">Startup</SelectItem>
+                        <SelectItem value="ngo">NGO</SelectItem>
+                        <SelectItem value="defence">Defence</SelectItem>
+                        <SelectItem value="agriculture">Agriculture</SelectItem>
+                        <SelectItem value="skilled_trade">Skilled Trade</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -599,6 +757,17 @@ export default function ProfilePage() {
             </Button>
           </div>
         </form>
+          </TabsContent>
+
+          {/* Education & Experience Tab Content */}
+          <TabsContent value="education-experience" className="space-y-6">
+            {/* Education Section */}
+            <EducationSection />
+
+            {/* Experience Section */}
+            <ExperienceSection />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
 
@@ -607,7 +776,7 @@ export default function ProfilePage() {
         <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
           <div className="flex items-center gap-3 bg-green-500 text-white px-5 py-3 rounded-lg shadow-lg">
             <CheckCircle className="w-5 h-5" />
-            <span className="font-medium">Profile Updated Successfully!</span>
+            <span className="font-medium">{toastMessage}</span>
           </div>
         </div>
       )}

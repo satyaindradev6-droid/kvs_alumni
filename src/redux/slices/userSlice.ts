@@ -60,6 +60,7 @@ const initialState: UserState = {
 };
 
 // Async thunk for fetching user profile by ID
+// Always fetches fresh data from API - no localStorage caching
 export const fetchUserProfile = createAsyncThunk(
   'user/fetchProfile',
   async (forceRefresh: boolean = false, { rejectWithValue }) => {
@@ -81,7 +82,7 @@ export const fetchUserProfile = createAsyncThunk(
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       
-      console.log('Fetching user profile:', { alumniId, apiUrl });
+      console.log('Fetching fresh user profile from API:', { alumniId, apiUrl });
       
       const response = await fetch(`${apiUrl}/api/alumni/${alumniId}`, {
         method: 'GET',

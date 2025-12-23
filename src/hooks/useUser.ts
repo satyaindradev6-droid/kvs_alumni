@@ -7,12 +7,11 @@ export const useUser = () => {
   const dispatch = useAppDispatch();
   const { profile, loading, error, isLoaded } = useAppSelector((state) => state.user);
 
-  // Fetch user profile on hook initialization (only if not already loaded)
+  // Always fetch fresh user profile from API on component mount
   useEffect(() => {
-    if (!isLoaded && !loading) {
-      dispatch(fetchUserProfile());
-    }
-  }, [dispatch, isLoaded, loading]);
+    dispatch(fetchUserProfile(true));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - fetch once on mount
 
   // Always fetch fresh data from API
   const refetchUser = () => {

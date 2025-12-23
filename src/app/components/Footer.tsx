@@ -14,6 +14,7 @@ export default function Footer() {
               height={60}
               className="object-contain"
             />
+            
             <div>
               <h3 className="text-sm font-semibold text-orange-400">Bhakti Returns district</h3>
               <h2 className="text-base font-bold">Kendriya Vidyalaya Sangathan</h2>

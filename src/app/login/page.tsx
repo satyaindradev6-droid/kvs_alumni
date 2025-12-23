@@ -77,29 +77,8 @@ function LoginContent() {
         }))
         console.log('Stored user:', { id: userId, email: userEmail, name: userName, type: userType })
 
-        // Fetch full user profile using the alumniId
-        if (userId) {
-          try {
-            const profileResponse = await fetch(`${API_URL}/api/alumni/${userId}`, {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${userToken}`,
-              },
-            })
-            const profileData = await profileResponse.json()
-            console.log('User profile API response:', profileData)
-            
-            // Store full profile in localStorage
-            if (profileResponse.ok) {
-              const fullProfile = profileData.alumni || profileData
-              localStorage.setItem('userProfile', JSON.stringify(fullProfile))
-              console.log('Full user profile stored:', fullProfile)
-            }
-          } catch (profileErr) {
-            console.error('Error fetching profile:', profileErr)
-          }
-        }
+        // Note: User profile will be fetched from API when needed via Redux
+        // No localStorage caching for profile data
 
         // Show success toast
         setShowToast(true)
